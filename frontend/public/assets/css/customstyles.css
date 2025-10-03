@@ -1,0 +1,3 @@
+i[class^="fi-rs-"]:before, i[class*=" fi-rs-"]:before, span[class^="fi-rs-"]:before, span[class*="fi-rs-"]:before{
+    font-weight: bold;
+}

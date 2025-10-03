@@ -1,0 +1,84 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+dash/node_modules
+tawsyla_backend/node_modules
+scraping/node_modules
+
+frontend/node_modules/.expo/web
+frontend/.next/
+scraping/images
+scraping/dist
+scraping
+
+
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+dash/build
+tawsyla_backend/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.idea
+package-lock.json
+.eslintcache
+debug.log
+
+
+
+
+# compiled output
+tawsyla_backend/dist
+tawsyla_backend/node_modules
+
+# Logs
+tawsyla_backend/logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+.data
+tawsyla_backend/files/*
+!tawsyla_backend/files/*/ 
+# .env
+tawsyla_backend/ormconfig.json

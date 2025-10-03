@@ -1,0 +1,100 @@
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_pass
+      POSTGRES_DB: tawsyla_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nest_network
+    ports:
+      - "5432:5432"
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: redis
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - nest_network
+  #   command: ["redis-server", "--appendonly", "yes"]
+
+
+  nestjs:
+    build: ./tawsyla_backend
+    env_file:
+      - ./tawsyla_backend/.env
+    container_name: nestjs-app
+    # environment:
+    #   DATABASE_HOST: postgres
+    #   DATABASE_PORT: 5432
+    #   DATABASE_USERNAME: postgres
+    #   DATABASE_PASSWORD: postgres_pass
+    #   DATABASE_NAME: plaisir_db
+    # depends_on:
+    #   - postgres
+    networks:
+      - nest_network
+    expose:
+      - "3000"  # Expose port internally (not to the outside world)
+    restart: always
+
+  # dashboard:
+  #   build: ./plaisir_dash
+  #   container_name: dashboard-app
+
+  #   volumes:
+  #     - ./plaisir_dash/build:/usr/share/nginx/html  # For React build output
+  #   environment:
+  #     - NODE_ENV=production
+  #     - NODE_OPTIONS=--max-old-space-size=4096
+
+  #   networks:
+  #     - nest_network 
+
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     # - ./plaisir_dash/build:/usr/share/nginx/html  # React build files
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro
+  #   ports:
+  #     - "80:80" 
+  #     - "443:443"  # Expose HTTPS port
+  #   networks:
+  #     - nest_network
+  #   depends_on:
+  #     - nestjs  # Make sure Nginx starts after NestJS app
+  #     - dashboard
+  # nextjs:
+  #   build: ./plaisir_nextjs
+  #   container_name: nextjs-app
+  #   environment:
+  #     NODE_ENV: production
+  #     NODE_OPTIONS: --max-old-space-size=4096
+  #     NEXT_DISABLE_ESLINT: true
+  #   networks:
+  #     - nest_network
+  #   ports:
+  #     - "5000:5000"  # Expose Next.js app on port 5000
+  #   expose:
+  #     - "5000"
+  #   depends_on:
+  #     - nestjs 
+ 
+networks:
+  nest_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
