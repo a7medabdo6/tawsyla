@@ -40,25 +40,25 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          # Create directory on droplet
-          ssh $DROPLET_USERNAME@$DROPLET_HOST "mkdir -p /opt/tawsyla/tawsyla_backend /opt/tawsyla/.github/scripts"
+          # Create deployment directory on droplet
+          ssh $DROPLET_USERNAME@$DROPLET_HOST "mkdir -p /opt/tawsyla"
           
-          # Transfer deployment script
-          scp .github/scripts/deploy-image.sh $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/.github/scripts/
-          ssh $DROPLET_USERNAME@$DROPLET_HOST "chmod +x /opt/tawsyla/.github/scripts/deploy-image.sh"
-          
-          # Sync source code (optional - for reference/debugging)
+          # Sync ALL project files to droplet
           rsync -avz --delete \
             --exclude 'node_modules' \
+            --exclude '.git' \
             --exclude 'dist' \
             --exclude 'build' \
-            tawsyla_backend/ $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/tawsyla_backend/
+            --exclude '.next' \
+            --exclude 'coverage' \
+            --exclude 'tawsyla-backend.tar.gz' \
+            ./ $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
           
-          # Transfer the image
+          # Make deployment scripts executable
+          ssh $DROPLET_USERNAME@$DROPLET_HOST "chmod +x /opt/tawsyla/.github/scripts/*.sh"
+          
+          # Transfer the Docker image
           scp tawsyla-backend.tar.gz $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
-          
-          # Transfer docker-compose file
-          scp docker-compose.yaml $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
 
       - name: Load and Run Docker Image
         env:
