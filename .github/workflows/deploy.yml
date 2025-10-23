@@ -1,4 +1,4 @@
-name: Build and Deploy to DigitalOcean
+name: Deploy to DigitalOcean
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
         run: |
           # Create deployment directory on droplet if it doesn't exist
           ssh $DROPLET_USERNAME@$DROPLET_HOST "mkdir -p /opt/tawsyla"
-          
+
           # Copy files to droplet (excluding node_modules and other large files)
           rsync -avz --delete \
             --exclude 'node_modules' \
@@ -39,7 +39,8 @@ jobs:
             --exclude '.next' \
             --exclude 'coverage' \
             ./ $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
-          
+
+          # Make deployment scripts executable
           ssh $DROPLET_USERNAME@$DROPLET_HOST "chmod +x /opt/tawsyla/.github/scripts/*.sh"
 
       - name: Build and Start Docker Containers
