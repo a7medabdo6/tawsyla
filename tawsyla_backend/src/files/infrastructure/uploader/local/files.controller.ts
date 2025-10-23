@@ -6,6 +6,7 @@ import {
   Response,
   UploadedFile,
   UseInterceptors,
+  NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -18,6 +19,8 @@ import {
 import { FilesLocalService } from './files.service';
 import { FileResponseDto } from './dto/file-response.dto';
 import { join } from 'path';
+import { existsSync } from 'fs';
+import { Response as ExpressResponse } from 'express';
 
 @ApiTags('Files')
 @Controller({
@@ -54,18 +57,77 @@ export class FilesLocalController {
 
   @Get('images/:path')
   @ApiExcludeEndpoint()
-  downloadStatics(@Param('path') path, @Response() response) {
-    console.log(path, 'pathhhh');
+  downloadStatics(
+    @Param('path') path: string,
+    @Response() response: ExpressResponse,
+  ) {
+    console.log('Requested path:', path);
     const filePath = join(process.cwd(), 'files', 'images', path);
     console.log('Serving file from:', filePath);
-    return response.sendFile(filePath);
+    
+    if (!existsSync(filePath)) {
+      console.error('File not found:', filePath);
+      throw new NotFoundException('File not found');
+    }
+
+    // Set proper content type based on file extension
+    const ext = path.toLowerCase().split('.').pop() || '';
+    const contentTypeMap: Record<string, string> = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+    };
+    
+    const contentType = contentTypeMap[ext] || 'application/octet-stream';
+    response.setHeader('Content-Type', contentType);
+    
+    return response.sendFile(filePath, (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        if (!response.headersSent) {
+          response.status(404).send('File not found');
+        }
+      }
+    });
   }
   
   @Get(':path')
   @ApiExcludeEndpoint()
-  download(@Param('path') path, @Response() response) {
+  download(
+    @Param('path') path: string,
+    @Response() response: ExpressResponse,
+  ) {
+    console.log('Requested path:', path);
     const filePath = join(process.cwd(), 'files', 'images', path);
     console.log('Serving file from:', filePath);
-    return response.sendFile(filePath);
+    
+    if (!existsSync(filePath)) {
+      console.error('File not found:', filePath);
+      throw new NotFoundException('File not found');
+    }
+
+    // Set proper content type based on file extension
+    const ext = path.toLowerCase().split('.').pop() || '';
+    const contentTypeMap: Record<string, string> = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+    };
+    
+    const contentType = contentTypeMap[ext] || 'application/octet-stream';
+    response.setHeader('Content-Type', contentType);
+    
+    return response.sendFile(filePath, (err) => {
+      if (err) {
+        console.error('Error sending file:', err);
+        if (!response.headersSent) {
+          response.status(404).send('File not found');
+        }
+      }
+    });
   }
 }

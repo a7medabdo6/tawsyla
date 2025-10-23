@@ -160,7 +160,7 @@ services:
     networks:
       - nest_network
     ports:
-      - "4000:3000"  # Expose to host
+      - "3000:3000"  # Expose to host
     restart: always
 
 networks:
@@ -231,7 +231,7 @@ docker-compose logs -f nestjs
 sudo ufw allow 22/tcp
 
 # Allow your application port
-sudo ufw allow 4000/tcp
+sudo ufw allow 3000/tcp
 
 # Allow HTTP/HTTPS if using nginx
 sudo ufw allow 80/tcp
