@@ -30,6 +30,11 @@ jobs:
           # Create deployment directory on droplet if it doesn't exist
           ssh $DROPLET_USERNAME@$DROPLET_HOST "mkdir -p /opt/tawsyla"
           
+          # Copy deployment scripts first
+          scp .github/scripts/deploy.sh $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
+          scp .github/scripts/health-check.sh $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
+          ssh $DROPLET_USERNAME@$DROPLET_HOST "chmod +x /opt/tawsyla/deploy.sh /opt/tawsyla/health-check.sh"
+          
           # Copy files to droplet (excluding node_modules and other large files)
           rsync -avz --delete \
             --exclude 'node_modules' \
@@ -45,27 +50,11 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh -T $DROPLET_USERNAME@$DROPLET_HOST "cd /opt/tawsyla && \
-            echo 'Stopping existing containers...' && \
-            docker compose down || true && \
-            echo 'Removing old images...' && \
-            docker image prune -af && \
-            echo 'Building new images...' && \
-            docker compose build --no-cache && \
-            echo 'Starting containers...' && \
-            docker compose up -d && \
-            echo 'Running containers:' && \
-            docker compose ps"
+          ssh -T $DROPLET_USERNAME@$DROPLET_HOST "/opt/tawsyla/deploy.sh"
 
       - name: Health Check
         env:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh -T $DROPLET_USERNAME@$DROPLET_HOST "cd /opt/tawsyla && \
-            echo 'Waiting for services to start...' && \
-            sleep 10 && \
-            echo 'Checking container status:' && \
-            docker compose ps && \
-            echo 'Recent logs:' && \
-            docker compose logs --tail=50"
+          ssh -T $DROPLET_USERNAME@$DROPLET_HOST "/opt/tawsyla/health-check.sh"
