@@ -80,9 +80,13 @@ export class CreateOffersAndCouponsTables1752784147145
       `ALTER TABLE "offer_categories" ADD CONSTRAINT "FK_offer_categories_offer" FOREIGN KEY ("offerId") REFERENCES "offers"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
     );
 
-    await queryRunner.query(
-      `ALTER TABLE "offer_categories" ADD CONSTRAINT "FK_offer_categories_category" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
-    );
+    // Check if categories table exists before adding foreign key
+    const categoriesTableExists = await queryRunner.hasTable('categories');
+    if (categoriesTableExists) {
+      await queryRunner.query(
+        `ALTER TABLE "offer_categories" ADD CONSTRAINT "FK_offer_categories_category" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+      );
+    }
 
     // Create indexes
     await queryRunner.query(
