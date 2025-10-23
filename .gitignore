@@ -78,7 +78,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .data
-tawsyla_backend/files/*
-!tawsyla_backend/files/*/ 
+# tawsyla_backend/files/*
+# !tawsyla_backend/files/*/ 
 # .env
 tawsyla_backend/ormconfig.json
