@@ -1,0 +1,17 @@
+{
+    "name": "Free Coffee Mug",
+    "description": "Get a free branded coffee mug with your next order",
+    "type": "free_product",
+    "pointsCost": 300,
+    "freeProductId": "123e4567-e89b-12d3-a456-426614174000",
+    "freeProductVariantId": "123e4567-e89b-12d3-a456-426614174001",
+    "freeProductQuantity": 1,
+    "minimumOrderAmount": 25.00,
+    "usageLimit": 50,
+    "usageLimitPerUser": 1,
+    "validFrom": "2024-01-01T00:00:00.000Z",
+    "validUntil": "2024-12-31T23:59:59.000Z",
+    "eligibleTierIds": [
+        "123e4567-e89b-12d3-a456-426614174000"
+    ]
+}
