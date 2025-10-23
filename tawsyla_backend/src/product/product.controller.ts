@@ -31,12 +31,6 @@ export class ProductController implements CrudController<Product> {
     return this;
   }
 
-  @Override('getManyBase')
-  async getManyBase(): Promise<Product[]> {
-    return this.service.find({
-      relations: ['category', 'image', 'variants'],
-    });
-  }
   @Override('createOneBase')
   @ApiBearerAuth()
   @Roles(RoleEnum.admin, RoleEnum.user)
