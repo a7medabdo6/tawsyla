@@ -45,21 +45,21 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh $DROPLET_USERNAME@$DROPLET_HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no $DROPLET_USERNAME@$DROPLET_HOST << 'EOF'
             cd /opt/tawsyla
-            
+
             # Stop existing containers
             docker compose down
-            
+
             # Remove old images to save space (optional)
             docker image prune -af
-            
+
             # Build new images
             docker compose build --no-cache
-            
+
             # Start containers
             docker compose up -d
-            
+
             # Show running containers
             docker compose ps
           EOF
