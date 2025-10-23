@@ -55,27 +55,17 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh $DROPLET_USERNAME@$DROPLET_HOST << 'EOF'
+          bash -c "
+          ssh -o StrictHostKeyChecking=no $DROPLET_USERNAME@$DROPLET_HOST 'bash -s' <<'EOSSH'
             cd /opt/tawsyla
-            
-            # Load the Docker image
             docker load < tawsyla-backend.tar.gz
-            
-            # Stop existing containers
             docker compose down
-            
-            # Start containers with the new image
             docker compose up -d
-            
-            # Clean up the tar file
-            rm tawsyla-backend.tar.gz
-            
-            # Show running containers
+            rm -f tawsyla-backend.tar.gz
             docker compose ps
-            
-            # Show logs
             docker compose logs --tail=30 nestjs
-          EOF
+          EOSSH
+          "
 
       - name: Cleanup
         if: always()
