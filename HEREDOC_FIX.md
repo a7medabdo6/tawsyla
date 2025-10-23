@@ -4,56 +4,65 @@
 The error `yaml: line 43: found character that cannot start any token` occurred because the heredoc syntax was being interpreted as YAML instead of bash commands.
 
 ## Root Cause
-- Using `<< 'EOF'` in SSH commands causes issues with YAML parsing
+- Using `<< 'EOF'` or `<< 'ENDSSH'` in SSH commands causes issues with YAML parsing
 - The `docker compose` commands were being interpreted as YAML syntax
+- Heredoc delimiters conflict with YAML structure
 - Pseudo-terminal warning: "stdin is not a terminal"
 
-## Solution Applied
+## Solution Applied (Final)
 
 ### Changes Made:
-1. **Changed SSH command**: Added `-T` flag to disable pseudo-terminal allocation
-2. **Changed heredoc delimiter**: Changed from `EOF` to `ENDSSH` to avoid conflicts
-3. **Added explicit bash invocation**: `ssh -T user@host bash << 'ENDSSH'`
-4. **Added error handling**: `set -e` and `|| true` for non-critical commands
-5. **Added echo statements**: Better logging for debugging
+1. **Removed heredoc syntax entirely**: Use inline command chaining instead
+2. **Added `-T` flag**: Disable pseudo-terminal allocation
+3. **Use `&&` operators**: Chain commands in a single SSH session
+4. **Wrap in double quotes**: Properly escape the command string
+5. **Use `|| true`**: Allow non-critical commands to fail gracefully
 
-### Before:
-```yaml
-run: |
-  ssh $USER@$HOST << 'EOF'
-    docker compose down
-  EOF
-```
-
-### After:
+### Before (Broken):
 ```yaml
 run: |
   ssh -T $USER@$HOST bash << 'ENDSSH'
-    set -e
-    echo "Stopping containers..."
-    docker compose down || true
+    docker compose down
+    docker compose up -d
   ENDSSH
+```
+
+### After (Working):
+```yaml
+run: |
+  ssh -T $USER@$HOST "cd /opt/tawsyla && \
+    echo 'Stopping containers...' && \
+    docker compose down || true && \
+    echo 'Starting containers...' && \
+    docker compose up -d"
 ```
 
 ## Key Changes:
 
-### 1. `-T` Flag
+### 1. No Heredoc
+- Completely removed heredoc syntax (`<< 'EOF'` or `<< 'ENDSSH'`)
+- Avoids YAML parsing conflicts entirely
+- More reliable in GitHub Actions
+
+### 2. `-T` Flag
 - Disables pseudo-terminal allocation
 - Fixes "Pseudo-terminal will not be allocated" warning
-- Required when piping commands via heredoc
+- Required for non-interactive SSH sessions
 
-### 2. `bash << 'ENDSSH'`
-- Explicitly invokes bash shell
-- Uses `ENDSSH` delimiter (less likely to conflict)
-- Single quotes prevent variable expansion in heredoc
-
-### 3. `set -e`
-- Exit immediately if any command fails
-- Better error handling
+### 3. Command Chaining with `&&`
+- All commands in a single SSH session
+- Commands execute sequentially
+- Stops on first failure (unless using `|| true`)
 
 ### 4. `|| true`
-- Allows commands to fail without stopping the script
+- Allows specific commands to fail without stopping the script
 - Used for `docker compose down` (might not have containers to stop)
+- Ensures workflow continues even if command fails
+
+### 5. Backslash Line Continuation
+- `\` at end of lines for readability
+- Keeps YAML clean and easy to read
+- All commands are part of one string
 
 ## Files Updated:
 - ✅ `.github/workflows/deploy.yml`
