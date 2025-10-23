@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { FilesLocalService } from './files.service';
 import { FileResponseDto } from './dto/file-response.dto';
+import { join } from 'path';
 
 @ApiTags('Files')
 @Controller({
@@ -55,12 +56,16 @@ export class FilesLocalController {
   @ApiExcludeEndpoint()
   downloadStatics(@Param('path') path, @Response() response) {
     console.log(path, 'pathhhh');
-
-    return response.sendFile(path, { root: './files/images' });
+    const filePath = join(process.cwd(), 'files', 'images', path);
+    console.log('Serving file from:', filePath);
+    return response.sendFile(filePath);
   }
+  
   @Get(':path')
   @ApiExcludeEndpoint()
   download(@Param('path') path, @Response() response) {
-    return response.sendFile(path, { root: './files/images' });
+    const filePath = join(process.cwd(), 'files', 'images', path);
+    console.log('Serving file from:', filePath);
+    return response.sendFile(filePath);
   }
 }
