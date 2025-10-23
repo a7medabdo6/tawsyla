@@ -45,39 +45,38 @@ jobs:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          bash -c "
-          ssh -o StrictHostKeyChecking=no $DROPLET_USERNAME@$DROPLET_HOST <<'EOF'
+          ssh -T $DROPLET_USERNAME@$DROPLET_HOST bash << 'ENDSSH'
+            set -e
             cd /opt/tawsyla
-
-            # Stop existing containers
-            docker compose down
-
-            # Remove old images to save space (optional)
+            
+            echo "Stopping existing containers..."
+            docker compose down || true
+            
+            echo "Removing old images..."
             docker image prune -af
-
-            # Build new images
+            
+            echo "Building new images..."
             docker compose build --no-cache
-
-            # Start containers
+            
+            echo "Starting containers..."
             docker compose up -d
-
-            # Show running containers
+            
+            echo "Running containers:"
             docker compose ps
-          EOF
-          "
+          ENDSSH
 
       - name: Health Check
         env:
           DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
           DROPLET_USERNAME: ${{ secrets.DROPLET_USERNAME }}
         run: |
-          ssh $DROPLET_USERNAME@$DROPLET_HOST << 'EOF'
-            # Wait for services to start
+          ssh -T $DROPLET_USERNAME@$DROPLET_HOST bash << 'ENDSSH'
+            echo "Waiting for services to start..."
             sleep 10
             
-            # Check if containers are running
+            echo "Checking container status:"
             docker compose ps
             
-            # Check logs for any errors
+            echo "Recent logs:"
             docker compose logs --tail=50
-          EOF
+          ENDSSH
