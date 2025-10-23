@@ -10,7 +10,7 @@ echo "Removing old images..."
 docker image prune -af
 
 echo "Building new images..."
-docker compose build 
+docker compose build --no-cache
 
 echo "Starting containers..."
 docker compose up -d

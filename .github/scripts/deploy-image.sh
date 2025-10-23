@@ -9,6 +9,9 @@ docker load < tawsyla-backend.tar.gz
 echo "Stopping existing containers..."
 docker compose down || true
 
+echo "Removing old images..."
+docker image prune -af
+
 echo "Starting containers with new image..."
 docker compose up -d
 
