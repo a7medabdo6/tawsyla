@@ -40,7 +40,6 @@ jobs:
             --exclude 'coverage' \
             ./ $DROPLET_USERNAME@$DROPLET_HOST:/opt/tawsyla/
           
-          # Make deployment scripts executable
           ssh $DROPLET_USERNAME@$DROPLET_HOST "chmod +x /opt/tawsyla/.github/scripts/*.sh"
 
       - name: Build and Start Docker Containers
