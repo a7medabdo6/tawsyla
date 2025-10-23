@@ -1,0 +1,88 @@
+====================================
+GITHUB ACTIONS DEPLOYMENT SETUP
+====================================
+
+STEP 1: Add Public Key to Your DigitalOcean Droplet
+----------------------------------------------------
+Run this command on your LOCAL machine (replace YOUR_DROPLET_IP and YOUR_USERNAME):
+
+ssh-copy-id -i ~/.ssh/github_actions_tawsyla.pub YOUR_USERNAME@YOUR_DROPLET_IP
+
+OR manually add it:
+1. SSH into your droplet: ssh root@YOUR_DROPLET_IP
+2. Run: mkdir -p ~/.ssh && chmod 700 ~/.ssh
+3. Run: nano ~/.ssh/authorized_keys
+4. Paste this public key at the end:
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVl4v6xihIP0O3ubgsw+5CFQ35vzD4fo/Vm1yd7+QJ1 github-actions-tawsyla
+
+5. Save and exit (Ctrl+X, then Y, then Enter)
+6. Run: chmod 600 ~/.ssh/authorized_keys
+
+
+STEP 2: Add GitHub Secrets
+----------------------------------------------------
+Go to: https://github.com/a7medabdo6/tawsyla/settings/secrets/actions
+
+Add these 3 secrets:
+
+1. Secret Name: DROPLET_HOST
+   Value: YOUR_DROPLET_IP (e.g., 123.45.67.89)
+
+2. Secret Name: DROPLET_USERNAME
+   Value: YOUR_SSH_USERNAME (e.g., root or deployer)
+
+3. Secret Name: DROPLET_SSH_KEY
+   Value: Copy EVERYTHING below (including BEGIN and END lines)
+
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACDVZeL+sYoSD9Dt7m4LMPuQhUN+b8w+H6P1Ztcne/kCdQAAAKDEgfgZxIH4
+GQAAAAtzc2gtZWQyNTUxOQAAACDVZeL+sYoSD9Dt7m4LMPuQhUN+b8w+H6P1Ztcne/kCdQ
+AAAECAC0ah7jnedXfJUpJi9FfV+ep7Yh5aTSLG5H7RzuKZxdVl4v6xihIP0O3ubgsw+5CF
+Q35vzD4fo/Vm1yd7+QJ1AAAAFmdpdGh1Yi1hY3Rpb25zLXRhd3N5bGEBAgMEBQYH
+-----END OPENSSH PRIVATE KEY-----
+
+
+STEP 3: Test SSH Connection
+----------------------------------------------------
+Test the connection from your local machine:
+
+ssh -i ~/.ssh/github_actions_tawsyla YOUR_USERNAME@YOUR_DROPLET_IP
+
+
+STEP 4: Choose Deployment Workflow
+----------------------------------------------------
+You have 2 workflow options:
+
+Option A: deploy.yml (Recommended for smaller projects)
+- Delete: .github/workflows/deploy-with-image-transfer.yml
+- Keep: .github/workflows/deploy.yml
+
+Option B: deploy-with-image-transfer.yml (Recommended for larger projects)
+- Delete: .github/workflows/deploy.yml
+- Keep: .github/workflows/deploy-with-image-transfer.yml
+
+
+STEP 5: Commit and Push
+----------------------------------------------------
+git add .github/workflows/
+git add docker-compose.yaml
+git add DEPLOYMENT.md
+git commit -m "Add auto-deployment workflow"
+git push origin main
+
+
+STEP 6: Monitor Deployment
+----------------------------------------------------
+1. Go to: https://github.com/a7medabdo6/tawsyla/actions
+2. Watch the workflow run
+3. Check for any errors
+
+
+IMPORTANT NOTES:
+----------------------------------------------------
+- Keep the private key (DROPLET_SSH_KEY) SECRET - never commit it!
+- The public key is safe to share and goes on your droplet
+- The private key stays in GitHub secrets only
+- Make sure your droplet has Docker installed (see DEPLOYMENT.md)

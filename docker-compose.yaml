@@ -13,6 +13,7 @@ services:
       - nest_network
     ports:
       - "5432:5432"
+    restart: always
   # redis:
   #   image: redis:7-alpine
   #   container_name: redis
@@ -31,19 +32,19 @@ services:
     env_file:
       - ./tawsyla_backend/.env
     container_name: nestjs-app
-    # environment:
-    #   DATABASE_HOST: postgres
-    #   DATABASE_PORT: 5432
-    #   DATABASE_USERNAME: postgres
-    #   DATABASE_PASSWORD: postgres_pass
-    #   DATABASE_NAME: plaisir_db
-    # depends_on:
-    #   - postgres
+    depends_on:
+      - postgres
     networks:
       - nest_network
-    expose:
-      - "3000"  # Expose port internally (not to the outside world)
+    ports:
+      - "4000:3000"  # Map host port 4000 to container port 3000
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health" || "exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # dashboard:
   #   build: ./plaisir_dash
