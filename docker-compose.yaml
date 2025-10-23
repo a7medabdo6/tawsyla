@@ -40,7 +40,7 @@ services:
       - "4000:3000"  # Map host port 4000 to container port 3000
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health" || "exit 1"]
+      test: sh -c "curl -f http://localhost:3000/api/health || exit 1"
       interval: 30s
       timeout: 10s
       retries: 3
