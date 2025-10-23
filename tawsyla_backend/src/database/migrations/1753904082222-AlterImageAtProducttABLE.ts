@@ -84,7 +84,7 @@ export class AlterImageAtProducttABLE1753904082222
     await queryRunner.query(
       `ALTER TABLE "offer_products" DROP CONSTRAINT "FK_offer_products_offer"`,
     );
-    
+
     // Check if constraint exists before dropping
     const categoryConstraintExists = await queryRunner.query(
       `SELECT 1 FROM pg_constraint WHERE conname = 'FK_offer_categories_category'`,
@@ -94,7 +94,7 @@ export class AlterImageAtProducttABLE1753904082222
         `ALTER TABLE "offer_categories" DROP CONSTRAINT "FK_offer_categories_category"`,
       );
     }
-    
+
     await queryRunner.query(
       `ALTER TABLE "offer_categories" DROP CONSTRAINT "FK_offer_categories_offer"`,
     );

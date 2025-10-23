@@ -9,16 +9,16 @@ import { Category } from '../../../../category/entities/category.entity';
 import { FileEntity } from '../../../../files/infrastructure/persistence/relational/entities/file.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            Product,
-            ProductVariant,
-            Company,
-            Category,
-            FileEntity,
-        ]),
-    ],
-    providers: [ProductSeedService],
-    exports: [ProductSeedService],
+  imports: [
+    TypeOrmModule.forFeature([
+      Product,
+      ProductVariant,
+      Company,
+      Category,
+      FileEntity,
+    ]),
+  ],
+  providers: [ProductSeedService],
+  exports: [ProductSeedService],
 })
-export class ProductSeedModule { }
+export class ProductSeedModule {}

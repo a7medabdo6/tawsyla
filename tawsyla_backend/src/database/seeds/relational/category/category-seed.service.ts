@@ -17,7 +17,7 @@ export class CategorySeedService {
   constructor(
     @InjectRepository(Category)
     private repository: Repository<Category>,
-  ) { }
+  ) {}
 
   async run() {
     console.log('Starting category seeding...');
@@ -42,7 +42,9 @@ export class CategorySeedService {
       console.log(
         `Categories already exist (${existingCategoriesCount} categories found). Skipping category seeding to avoid duplicates.`,
       );
-      console.log('If you want to add new categories, please clear the categories table first or modify the seed service.');
+      console.log(
+        'If you want to add new categories, please clear the categories table first or modify the seed service.',
+      );
       return;
     }
 
@@ -72,7 +74,7 @@ export class CategorySeedService {
     // Get existing categories
     const existingCategories = await this.repository.find();
     const existingCategoryNames = new Set(
-      existingCategories.map(cat => cat.nameAr)
+      existingCategories.map((cat) => cat.nameAr),
     );
 
     console.log(`Found ${existingCategories.length} existing categories`);
@@ -80,7 +82,8 @@ export class CategorySeedService {
     // Filter out categories that already exist
     const newCategories = new Map<string, CategoryData>();
     categoryMap.forEach((categoryData, key) => {
-      const categoryName = categoryData.level1 || categoryData.level2 || categoryData.level3;
+      const categoryName =
+        categoryData.level1 || categoryData.level2 || categoryData.level3;
       if (!existingCategoryNames.has(categoryName)) {
         newCategories.set(key, categoryData);
       }
