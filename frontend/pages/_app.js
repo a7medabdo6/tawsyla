@@ -11,39 +11,24 @@ import "react-responsive-modal/styles.css";
 // Swiper Slider
 import "swiper/css";
 import "swiper/css/navigation";
+import Head from "next/head";
 import StorageWrapper from "../components/ecommerce/storage-wrapper";
 import "../public/assets/css/main.css";
 import "../public/assets/css/customstyles.css";
-
 import store from "../redux/store";
-import Preloader from "./../components/elements/Preloader";
 import "@smastrom/react-rating/style.css";
 
 function MyApp({ Component, pageProps }) {
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    // new WOW.WOW({
-    //     live: false
-    //   }).init()
-  }, []);
   return (
-    <html dir="rtl">
-      {!loading ? (
-        <Provider store={store}>
-          <StorageWrapper>
-            <Component {...pageProps} />
-            <ToastContainer />
-          </StorageWrapper>
-        </Provider>
-      ) : (
-        <Preloader />
-      )}
-    </html>
+    <Provider store={store}>
+      <Head>
+        <title>Nest - Redux NextJS eCommerce Template</title>
+      </Head>
+      <StorageWrapper>
+        <Component {...pageProps} />
+        <ToastContainer />
+      </StorageWrapper>
+    </Provider>
   );
 }
 
