@@ -52,12 +52,12 @@ const Layout = ({
 
           <MobileMenu isToggled={isToggled} toggleClick={toggleClick} />
           <main className="main">
-            <Breadcrumb
+            {/* <Breadcrumb
               parent={parent}
               sub={sub}
               subChild={subChild}
               noBreadcrumb={noBreadcrumb}
-            />
+            /> */}
             {children}
           </main>
           <Footer />

@@ -15,9 +15,9 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <IntroPopup />
+      {/* <IntroPopup /> */}
 
-      <Layout noBreadcrumb="d-none">
+      <Layout>
         <section className="home-slider position-relative mb-30">
           <div className="container">
             <div className="home-slide-cover mt-30">
