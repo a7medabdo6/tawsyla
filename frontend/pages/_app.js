@@ -25,17 +25,12 @@ import { LanguageContext } from "../contexts/LanguageContext";
 
 function MyApp({ Component, pageProps }) {
   const { locale, changeLanguage, isLoading, isRTL } = useLanguage();
-  const [messages, setMessages] = useState(null);
+  const [messages, setMessages] = useState(() => getMessages("ar")); // Initialize with default locale
 
   useEffect(() => {
     // Load messages for current locale
     setMessages(getMessages(locale));
   }, [locale]);
-
-  // Show loading state while initializing
-  if (isLoading || !messages) {
-    return null;
-  }
 
   return (
     <Provider store={store}>
