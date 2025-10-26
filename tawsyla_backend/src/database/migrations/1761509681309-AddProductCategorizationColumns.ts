@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
-export class AddProductCategorizationColumns1730000000000
+export class AddProductCategorizationColumns1761509681309
   implements MigrationInterface
 {
-  name = 'AddProductCategorizationColumns1730000000000';
+  name = 'AddProductCategorizationColumns1761509681309';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Add salesCount column
