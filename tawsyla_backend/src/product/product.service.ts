@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { ProductVariant } from './entities/product-variant.entity';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { PaginationDto, PaginatedResponse } from './dto/pagination.dto';
 
 @Injectable()
 export class ProductService extends TypeOrmCrudService<Product> {
@@ -116,5 +117,144 @@ export class ProductService extends TypeOrmCrudService<Product> {
       throw new NotFoundException('Product not found');
     }
     return await this.repo.remove(product);
+  }
+
+  // Methods for handling dynamic categorization
+  // async updateProductCategories(
+  //   id: string,
+  //   options?: {
+  //     topSellingThreshold?: number;
+  //     trendingViewThreshold?: number;
+  //     trendingSalesThreshold?: number;
+  //     recentlyAddedDays?: number;
+  //     topRatedThreshold?: number;
+  //   }
+  // ): Promise<Product> {
+  //   const product = await this.repo.findOne({ where: { id } });
+  //   if (!product) {
+  //     throw new NotFoundException('Product not found');
+  //   }
+
+  //   product.updateAllCategories(options);
+  //   return this.repo.save(product);
+  // }
+
+  // Bulk update all products categories - disabled for normal operations
+  // Only needed for initial setup, threshold changes, or maintenance
+  // async updateAllProductsCategories(options?: {
+  //   topSellingThreshold?: number;
+  //   trendingViewThreshold?: number;
+  //   trendingSalesThreshold?: number;
+  //   recentlyAddedDays?: number;
+  //   topRatedThreshold?: number;
+  // }): Promise<void> {
+  //   const products = await this.repo.find();
+  //
+  //   for (const product of products) {
+  //     product.updateAllCategories(options);
+  //   }
+  //
+  //   await this.repo.save(products);
+  // }
+
+  async incrementSalesCount(id: string): Promise<Product> {
+    const product = await this.repo.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    product.salesCount += 1;
+    product.updateTopSelling();
+    product.updateTrending();
+
+    return this.repo.save(product);
+  }
+
+  async incrementViewCount(id: string): Promise<Product> {
+    const product = await this.repo.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    product.viewCount += 1;
+    product.updateTrending();
+
+    return this.repo.save(product);
+  }
+
+  async getProductsByCategory(
+    category: 'top-selling' | 'trending' | 'recently-added' | 'top-rated',
+    paginationDto: PaginationDto,
+  ): Promise<PaginatedResponse<Product>> {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+    } = paginationDto;
+    const skip = (page - 1) * limit;
+
+    const whereCondition: any = { isActive: true };
+
+    switch (category) {
+      case 'top-selling':
+        whereCondition.isTopSelling = true;
+        break;
+      case 'trending':
+        whereCondition.isTrending = true;
+        break;
+      case 'recently-added':
+        whereCondition.isRecentlyAdded = true;
+        break;
+      case 'top-rated':
+        whereCondition.isTopRated = true;
+        break;
+    }
+
+    // Define allowed sort fields for security
+    const allowedSortFields = [
+      'createdAt',
+      'updatedAt',
+      'nameEn',
+      'nameAr',
+      'rating',
+      'salesCount',
+      'viewCount',
+    ];
+
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const order = { [sortField]: sortOrder };
+
+    // Add category-specific default sorting
+    if (category === 'top-selling') {
+      order['salesCount'] = 'DESC';
+    } else if (category === 'trending') {
+      order['viewCount'] = 'DESC';
+      order['salesCount'] = 'DESC';
+    } else if (category === 'top-rated') {
+      order['rating'] = 'DESC';
+    }
+
+    const [data, total] = await this.repo.findAndCount({
+      where: whereCondition,
+      relations: ['company', 'category', 'variants', 'image'],
+      order,
+      skip,
+      take: limit,
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
   }
 }

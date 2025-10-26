@@ -8,6 +8,9 @@ import {
   Put,
   Query,
   Param,
+  Get,
+  Post,
+  Patch,
 } from '@nestjs/common';
 import { Crud, CrudController, CrudRequest, Override } from '@nestjsx/crud';
 import { Product } from './entities/product.entity';
@@ -20,6 +23,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../roles/roles.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto, PaginatedResponse } from './dto/pagination.dto';
 
 @ApiTags('Products')
 @Crud(productCrudConfig)
@@ -106,4 +110,45 @@ export class ProductController implements CrudController<Product> {
     }
     return await this.service.delete(id);
   }
+
+  // New endpoints for dynamic categorization
+  @Get('category/:category')
+  async getProductsByCategory(
+    @Param('category')
+    category: 'top-selling' | 'trending' | 'recently-added' | 'top-rated',
+    @Query() paginationDto: PaginationDto,
+  ): Promise<PaginatedResponse<Product>> {
+    return this.service.getProductsByCategory(category, paginationDto);
+  }
+
+  @Post(':id/view')
+  async incrementViewCount(@Param('id') id: string): Promise<Product> {
+    return this.service.incrementViewCount(id);
+  }
+
+  // Manual sales count increment disabled - sales are automatically tracked through orders
+  // @Post(':id/sale')
+  // @ApiBearerAuth()
+  // @Roles(RoleEnum.admin, RoleEnum.user)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // async incrementSalesCount(@Param('id') id: string): Promise<Product> {
+  //   return this.service.incrementSalesCount(id);
+  // }
+
+  // @Patch(':id/categories')
+  // @ApiBearerAuth()
+  // @Roles(RoleEnum.admin)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // async updateProductCategories(
+  //   @Param('id') id: string,
+  //   @Body() options?: {
+  //     topSellingThreshold?: number;
+  //     trendingViewThreshold?: number;
+  //     trendingSalesThreshold?: number;
+  //     recentlyAddedDays?: number;
+  //     topRatedThreshold?: number;
+  //   }
+  // ): Promise<Product> {
+  //   return this.service.updateProductCategories(id, options);
+  // }
 }

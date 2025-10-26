@@ -64,7 +64,7 @@ export class FilesLocalController {
     console.log('Requested path:', path);
     const filePath = join(process.cwd(), 'files', 'images', path);
     console.log('Serving file from:', filePath);
-    
+
     if (!existsSync(filePath)) {
       console.error('File not found:', filePath);
       throw new NotFoundException('File not found');
@@ -73,16 +73,16 @@ export class FilesLocalController {
     // Set proper content type based on file extension
     const ext = path.toLowerCase().split('.').pop() || '';
     const contentTypeMap: Record<string, string> = {
-      'jpg': 'image/jpeg',
-      'jpeg': 'image/jpeg',
-      'png': 'image/png',
-      'gif': 'image/gif',
-      'webp': 'image/webp',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
     };
-    
+
     const contentType = contentTypeMap[ext] || 'application/octet-stream';
     response.setHeader('Content-Type', contentType);
-    
+
     return response.sendFile(filePath, (err) => {
       if (err) {
         console.error('Error sending file:', err);
@@ -92,17 +92,14 @@ export class FilesLocalController {
       }
     });
   }
-  
+
   @Get(':path')
   @ApiExcludeEndpoint()
-  download(
-    @Param('path') path: string,
-    @Response() response: ExpressResponse,
-  ) {
+  download(@Param('path') path: string, @Response() response: ExpressResponse) {
     console.log('Requested path:', path);
     const filePath = join(process.cwd(), 'files', 'images', path);
     console.log('Serving file from:', filePath);
-    
+
     if (!existsSync(filePath)) {
       console.error('File not found:', filePath);
       throw new NotFoundException('File not found');
@@ -111,16 +108,16 @@ export class FilesLocalController {
     // Set proper content type based on file extension
     const ext = path.toLowerCase().split('.').pop() || '';
     const contentTypeMap: Record<string, string> = {
-      'jpg': 'image/jpeg',
-      'jpeg': 'image/jpeg',
-      'png': 'image/png',
-      'gif': 'image/gif',
-      'webp': 'image/webp',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
     };
-    
+
     const contentType = contentTypeMap[ext] || 'application/octet-stream';
     response.setHeader('Content-Type', contentType);
-    
+
     return response.sendFile(filePath, (err) => {
       if (err) {
         console.error('Error sending file:', err);

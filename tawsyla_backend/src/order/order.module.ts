@@ -12,6 +12,7 @@ import { OfferModule } from '../offer/offer.module';
 import { LoyaltyModule } from '../loyalty/loyalty.module';
 import { PushNotificationModule } from '../push-notifications/push-notification.module';
 import { UsersModule } from '../users/users.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UsersModule } from '../users/users.module';
     LoyaltyModule,
     PushNotificationModule,
     UsersModule,
+    ProductModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

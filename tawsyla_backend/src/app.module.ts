@@ -36,6 +36,7 @@ import { LoyaltyModule } from './loyalty/loyalty.module';
 import { BannerModule } from './Banner/banner.module';
 import { PushNotificationModule } from './push-notifications/push-notification.module';
 import { SettingsModule } from './settings/settings.module';
+import { ReviewModule } from './review/review.module';
 import pushNotificationConfig from './push-notifications/config/push-notification.config';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
@@ -108,6 +109,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     BannerModule,
     PushNotificationModule,
     SettingsModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}

@@ -20,6 +20,7 @@ import { LoyaltyService } from '../loyalty/loyalty.service';
 import { PointsSource } from '../loyalty/entities/loyalty-points.entity';
 import { PushNotificationService } from '../push-notifications/push-notification.service';
 import { UsersService } from '../users/users.service';
+import { ProductService } from '../product/product.service';
 import {
   OrderListResponseDto,
   OrderResponseDto,
@@ -45,6 +46,7 @@ export class OrderService {
     private loyaltyService: LoyaltyService,
     private pushNotificationService: PushNotificationService,
     private usersService: UsersService,
+    private productService: ProductService,
   ) {}
 
   async createOrder(
@@ -235,6 +237,17 @@ export class OrderService {
 
     await this.orderItemRepository.save(orderItemsToSave);
 
+    // Increment sales count for products if order is paid immediately
+    // Note: For most orders, sales count will be incremented when status changes to CONFIRMED/DELIVERED
+    // This is for scenarios where payment is processed immediately (e.g., credit card payments)
+    if (
+      createOrderDto.paymentMethod &&
+      createOrderDto.paymentMethod !== 'cash'
+    ) {
+      // For non-cash payments, we can assume the order is confirmed immediately
+      await this.incrementSalesCountForOrderItems(orderItemsToSave);
+    }
+
     // Award loyalty points for the order
     const userTier = await this.loyaltyService.getUserCurrentTier(userId);
     if (userTier) {
@@ -292,6 +305,26 @@ export class OrderService {
 
     // Return order with items
     return this.getOrderById(savedOrder.id, userId);
+  }
+
+  /**
+   * Increment sales count for all products in order items
+   * This method is called when order is confirmed or delivered
+   */
+  private async incrementSalesCountForOrderItems(
+    orderItems: OrderItem[],
+  ): Promise<void> {
+    try {
+      for (const item of orderItems) {
+        // Increment sales count by the quantity ordered
+        for (let i = 0; i < item.quantity; i++) {
+          await this.productService.incrementSalesCount(item.productId);
+        }
+      }
+    } catch (error) {
+      // Log error but don't fail the order process
+      console.error('Failed to increment sales count for order items:', error);
+    }
   }
 
   async getOrderById(id: string, user: any): Promise<Order> {
@@ -521,6 +554,19 @@ export class OrderService {
 
     // Update the order
     await this.orderRepository.update(id, updateData);
+
+    // Increment sales count when order is confirmed or delivered
+    if (status === OrderStatus.CONFIRMED || status === OrderStatus.DELIVERED) {
+      // Get order with items to increment sales count
+      const orderWithItems = await this.orderRepository.findOne({
+        where: { id },
+        relations: ['items'],
+      });
+
+      if (orderWithItems && orderWithItems.items) {
+        await this.incrementSalesCountForOrderItems(orderWithItems.items);
+      }
+    }
 
     // Ensure all intermediate statuses exist in history for proper flow (except CANCELLED and REFUNDED)
     if (status !== OrderStatus.CANCELLED && status !== OrderStatus.REFUNDED) {
