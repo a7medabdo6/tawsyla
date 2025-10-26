@@ -11,39 +11,43 @@ import "react-responsive-modal/styles.css";
 // Swiper Slider
 import "swiper/css";
 import "swiper/css/navigation";
+import Head from "next/head";
+import { NextIntlClientProvider } from "next-intl";
 import StorageWrapper from "../components/ecommerce/storage-wrapper";
 import "../public/assets/css/main.css";
 import "../public/assets/css/customstyles.css";
-
+import "../public/assets/css/language-switcher.css";
 import store from "../redux/store";
-import Preloader from "./../components/elements/Preloader";
 import "@smastrom/react-rating/style.css";
+import { useLanguage } from "../hooks/useLanguage";
+import { getMessages } from "../lib/getMessages";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 function MyApp({ Component, pageProps }) {
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+  const { locale, changeLanguage, isLoading, isRTL } = useLanguage();
+  const [messages, setMessages] = useState(() => getMessages("ar")); // Initialize with default locale
 
-    // new WOW.WOW({
-    //     live: false
-    //   }).init()
-  }, []);
+  useEffect(() => {
+    // Load messages for current locale
+    setMessages(getMessages(locale));
+  }, [locale]);
+
   return (
-    <html dir="rtl">
-      {!loading ? (
-        <Provider store={store}>
+    <Provider store={store}>
+      <LanguageContext.Provider
+        value={{ locale, changeLanguage, isRTL, isLoading }}
+      >
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Head>
+            <title>Nest - Redux NextJS eCommerce Template</title>
+          </Head>
           <StorageWrapper>
             <Component {...pageProps} />
             <ToastContainer />
           </StorageWrapper>
-        </Provider>
-      ) : (
-        <Preloader />
-      )}
-    </html>
+        </NextIntlClientProvider>
+      </LanguageContext.Provider>
+    </Provider>
   );
 }
 

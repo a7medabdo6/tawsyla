@@ -1,0 +1,78 @@
+/* Language Switcher Styles */
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.language-switcher-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  background: transparent;
+  border: 1px solid #bce3c9;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #253d4e;
+}
+
+.language-switcher-btn:hover {
+  background-color: #3bb77e;
+  color: white;
+  border-color: #3bb77e;
+}
+
+.language-switcher-btn:hover i {
+  color: white;
+}
+
+.language-switcher-btn i {
+  font-size: 18px;
+  color: #3bb77e;
+  transition: color 0.3s ease;
+}
+
+.language-text {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Header Integration */
+.header-action-icon-2 .language-switcher {
+  margin: 0 5px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .language-switcher-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .language-switcher-btn i {
+    font-size: 16px;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .language-switcher-btn {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .language-switcher {
+  margin: 0 10px 0 0;
+}
+
+/* Dark Mode Support (if applicable) */
+.dark-mode .language-switcher-btn {
+  color: #fff;
+  border-color: #3bb77e;
+}
+
+.dark-mode .language-switcher-btn:hover {
+  background-color: #2a9d68;
+}
