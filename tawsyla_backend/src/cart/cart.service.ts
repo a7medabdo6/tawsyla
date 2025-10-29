@@ -162,13 +162,21 @@ export class CartService {
   async clearCart(userId: number): Promise<Cart> {
     const cart = await this.getOrCreateCart(userId);
 
-    await this.cartItemRepository.delete({ cartId: cart.id });
+    // Delete all cart items for this cart
+    await this.cartItemRepository
+      .createQueryBuilder()
+      .delete()
+      .where('cartId = :cartId', { cartId: cart.id })
+      .execute();
 
     // Reset cart totals
     cart.totalAmount = 0;
     cart.totalItems = 0;
+    cart.items = []; // Clear the items array
+
     await this.cartRepository.save(cart);
 
+    // Return the updated cart
     return this.getOrCreateCart(userId);
   }
 

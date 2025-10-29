@@ -63,6 +63,9 @@ export class ProductVariant {
   @Column({ type: 'varchar', length: 50, unique: true })
   ean: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  oldPrice: number;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 

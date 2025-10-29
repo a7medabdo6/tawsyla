@@ -98,7 +98,6 @@ export class CartController {
   }
 
   @Delete('items/:itemId')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove item from cart' })
   @ApiResponse({
     status: 204,
@@ -111,19 +110,18 @@ export class CartController {
   async removeItemFromCart(
     @Request() req: any,
     @Param('itemId') itemId: string,
-  ): Promise<void> {
-    await this.cartService.removeItemFromCart(req.user.id, itemId);
+  ): Promise<any> {
+    return await this.cartService.removeItemFromCart(req.user.id, itemId);
   }
 
   @Delete()
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Clear entire cart' })
   @ApiResponse({
     status: 204,
     description: 'Cart cleared successfully',
   })
-  async clearCart(@Request() req: any): Promise<void> {
-    await this.cartService.clearCart(req.user.id);
+  async clearCart(@Request() req: any): Promise<any> {
+    return await this.cartService.clearCart(req.user.id);
   }
 
   private mapCartToResponseDto(cart: any): CartResponseDto {

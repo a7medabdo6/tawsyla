@@ -74,6 +74,16 @@ export class CreateProductVariantDto {
   price: number;
 
   @ApiProperty({
+    description: 'Old price of the product variant',
+    example: 29.99,
+    minimum: 0,
+  })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  oldPrice?: number;
+
+  @ApiProperty({
     description: 'Stock quantity for this variant',
     example: 100,
     minimum: 0,
