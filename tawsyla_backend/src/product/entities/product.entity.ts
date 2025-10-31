@@ -28,10 +28,10 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   nameEn: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   nameAr: string;
 
   @Column({
@@ -46,6 +46,12 @@ export class Product {
 
   @Column({ type: 'text', nullable: true })
   descriptionAr?: string;
+
+  @Column({ type: 'text', nullable: true })
+  longDescriptionEn?: string;
+
+  @Column({ type: 'text', nullable: true })
+  longDescriptionAr?: string;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
