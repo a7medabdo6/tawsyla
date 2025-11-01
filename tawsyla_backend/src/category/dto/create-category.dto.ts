@@ -48,19 +48,27 @@ export class CreateCategoryDto {
   @IsOptional()
   image?: FileDto | null;
 
+  // @ApiPropertyOptional({
+  //   description: 'Parent category ID for hierarchical structure',
+  // })
+  // @IsOptional()
+  // @IsUUID()
+  // parentId?: string;
+
+  // @ApiPropertyOptional({
+  //   description: 'Category level in hierarchy (1, 2, 3, etc.)',
+  // })
+  // @IsOptional()
+  // @IsInt()
+  // level?: number;
+
   @ApiPropertyOptional({
-    description: 'Parent category ID for hierarchical structure',
+    description: 'Master category ID that this category belongs to',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsOptional()
   @IsUUID()
-  parentId?: string;
-
-  @ApiPropertyOptional({
-    description: 'Category level in hierarchy (1, 2, 3, etc.)',
-  })
-  @IsOptional()
-  @IsInt()
-  level?: number;
+  masterCategoryId?: string;
 
   @ApiPropertyOptional({
     description: 'Full path of the category (e.g., "Food > Dairy > Milk")',

@@ -48,9 +48,9 @@ export class CategoryController implements CrudController<Category> {
   constructor(public service: CategoryService) {}
 
   @Override()
-  @ApiBearerAuth()
-  @Roles(RoleEnum.admin)
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @ApiBearerAuth()
+  // @Roles(RoleEnum.admin)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
   async createOne(@Request() req: CrudRequest, @Body() dto: CreateCategoryDto) {
     return this.service.create(dto);
   }
