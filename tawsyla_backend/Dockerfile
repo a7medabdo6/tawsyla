@@ -23,8 +23,8 @@ RUN npm run build
 EXPOSE 3000
 
 # Run the app
-# CMD ["sh", "-c", "npm run schema:drop && npm run migration:run && npm run seed:run:relational && npm run start:prod"]
+CMD ["sh", "-c", "npm run schema:drop && npm run migration:run && npm run seed:run:relational && npm run start:prod"]
 # CMD ["sh", "-c", "npm run migration:run && npm run seed:run:relational && npm run start:prod"]
 # CMD ["sh", "-c", "npm run migration:run && npm run start:prod"]
 
-CMD ["npm", "run", "start:prod"]
+# CMD ["npm", "run", "start:prod"]

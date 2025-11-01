@@ -120,7 +120,6 @@ export class CategorySeedService {
       const category = this.repository.create({
         nameEn: level1Name, // Using Arabic name as both En and Ar for now
         nameAr: level1Name,
-        level: 1,
         fullPath: level1Name,
         descriptionEn: `Category: ${level1Name}`,
         descriptionAr: `فئة: ${level1Name}`,
@@ -146,11 +145,9 @@ export class CategorySeedService {
         const category = this.repository.create({
           nameEn: level2Name,
           nameAr: level2Name,
-          level: 2,
           fullPath: `${level1Name} > ${level2Name}`,
           descriptionEn: `Subcategory: ${level2Name}`,
           descriptionAr: `فئة فرعية: ${level2Name}`,
-          parentId: parentCategory.id,
         });
         categoriesToCreate.push(category);
         createdCategories.set(key, category);
@@ -176,11 +173,9 @@ export class CategorySeedService {
         const category = this.repository.create({
           nameEn: level3Name,
           nameAr: level3Name,
-          level: 3,
           fullPath: `${parts[0]} > ${parts[1]} > ${level3Name}`,
           descriptionEn: `Sub-subcategory: ${level3Name}`,
           descriptionAr: `فئة فرعية فرعية: ${level3Name}`,
-          parentId: parentCategory.id,
         });
         categoriesToCreate.push(category);
         createdCategories.set(key, category);
@@ -192,35 +187,6 @@ export class CategorySeedService {
 
     // Update parent references with actual IDs
     const updatedCategories: Category[] = [];
-
-    // Update level 2 categories with parent IDs
-    savedCategories.forEach((category) => {
-      if (category.level === 2 && category.parentId) {
-        const parentCategory = savedCategories.find(
-          (c) =>
-            c.level === 1 && c.fullPath === category.fullPath?.split(' > ')[0],
-        );
-        if (parentCategory) {
-          category.parentId = parentCategory.id;
-          updatedCategories.push(category);
-        }
-      }
-
-      // Update level 3 categories with parent IDs
-      if (category.level === 3 && category.parentId) {
-        const parentPath = category.fullPath
-          ?.split(' > ')
-          .slice(0, 2)
-          .join(' > ');
-        const parentCategory = savedCategories.find(
-          (c) => c.level === 2 && c.fullPath === parentPath,
-        );
-        if (parentCategory) {
-          category.parentId = parentCategory.id;
-          updatedCategories.push(category);
-        }
-      }
-    });
 
     if (updatedCategories.length > 0) {
       await this.repository.save(updatedCategories);

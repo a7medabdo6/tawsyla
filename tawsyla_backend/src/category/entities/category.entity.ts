@@ -12,6 +12,7 @@ import {
 import { Product } from '../../product/entities/product.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { FileEntity } from '../../files/infrastructure/persistence/relational/entities/file.entity';
+import { MasterCategory } from '../../master-category/entities/master-category.entity';
 
 @Entity('categories')
 export class Category {
@@ -48,39 +49,25 @@ export class Category {
   image?: FileEntity | null;
 
   @ApiPropertyOptional({
-    description: 'Parent category ID for hierarchical structure',
-  })
-  @Column({ type: 'uuid', nullable: true })
-  parentId?: string;
-
-  @ApiPropertyOptional({
-    type: () => Category,
-    description: 'Parent category',
-  })
-  @ManyToOne(() => Category, (category) => category.children, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'parentId' })
-  parent?: Category;
-
-  @ApiPropertyOptional({
-    type: () => [Category],
-    description: 'Child categories',
-  })
-  @OneToMany(() => Category, (category) => category.parent)
-  children: Category[];
-
-  @ApiPropertyOptional({
-    description: 'Category level in hierarchy (1, 2, 3, etc.)',
-  })
-  @Column({ type: 'int', default: 1 })
-  level: number;
-
-  @ApiPropertyOptional({
     description: 'Full path of the category (e.g., "Food > Dairy > Milk")',
   })
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   fullPath?: string;
+
+  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000' })
+  @Column({ type: 'uuid', nullable: true })
+  masterCategoryId?: string;
+
+  @ApiPropertyOptional({ type: () => MasterCategory })
+  @ManyToOne(
+    () => MasterCategory,
+    (masterCategory) => masterCategory.categories,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
+  @JoinColumn({ name: 'masterCategoryId' })
+  masterCategory?: MasterCategory;
 
   @ApiPropertyOptional({
     type: () => [Product],

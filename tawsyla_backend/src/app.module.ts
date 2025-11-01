@@ -28,6 +28,7 @@ import { CompanyModule } from './company/company.module';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { CartModule } from './cart/cart.module';
+import { MasterCategoryModule } from './master-category/master-category.module';
 import { FavouriteModule } from './favourite/favourite.module';
 import { AddressModule } from './address/address.module';
 import { OfferModule } from './offer/offer.module';
@@ -110,6 +111,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     PushNotificationModule,
     SettingsModule,
     ReviewModule,
+    MasterCategoryModule,
   ],
 })
 export class AppModule {}

@@ -32,7 +32,10 @@ export class SettingsService {
     createSettingsDto: CreateSettingsDto,
   ): Promise<SettingsResponseDto> {
     // Check if settings already exist
-    const existingSettings = await this.settingsRepository.findOne({});
+    const existingSettings = await this.settingsRepository.findOne({
+      where: { isActive: true },
+    });
+    console.log(existingSettings, 'existingSettings');
     if (existingSettings) {
       throw new BadRequestException(
         'Settings already exist. Use update endpoint to modify existing settings.',
@@ -179,45 +182,34 @@ export class SettingsService {
   /**
    * Get specific settings fields for public use
    */
-  async getPublicContactInfo(): Promise<{
-    appName: string;
-    logo?: FileType | null;
-    description?: string;
-    whatsappNumber1?: string;
-    whatsappNumber2?: string;
-    phone1?: string;
-    phone2?: string;
-    email?: string;
-    address?: string;
-    city?: string;
-    country?: string;
-    postalCode?: string;
-  }> {
-    const settings = await this.settingsRepository.findOne({
-      where: { isActive: true },
-      select: [
-        'appName',
-        'logo',
-        'description',
-        'whatsappNumber1',
-        'whatsappNumber2',
-        'phone1',
-        'phone2',
-        'email',
-        'address',
-        'city',
-        'country',
-        'postalCode',
-      ],
-    });
+  async getPublicContactInfo() {
+    const settings = await this.settingsRepository
+      .createQueryBuilder('settings')
+      .leftJoinAndSelect('settings.logo', 'logo')
+      .select([
+        'settings.appName',
+        'settings.description',
+        'settings.whatsappNumber1',
+        'settings.whatsappNumber2',
+        'settings.phone1',
+        'settings.phone2',
+        'settings.email',
+        'settings.address',
+        'settings.city',
+        'settings.country',
+        'settings.postalCode',
+        'logo.id',
+        'logo.path',
+      ])
+      .where('settings.isActive = :isActive', { isActive: true })
+      .getOne();
 
     if (!settings) {
-      throw new NotFoundException('Settings not found or inactive.');
+      throw new NotFoundException('No active settings found');
     }
 
     return settings;
   }
-
   /**
    * Get social media links for public use
    */
@@ -260,16 +252,17 @@ export class SettingsService {
     refundPolicy?: string;
     shippingPolicy?: string;
   }> {
-    const settings = await this.settingsRepository.findOne({
-      where: { isActive: true },
-      select: [
-        'aboutUs',
-        'termsAndConditions',
-        'privacyPolicy',
-        'refundPolicy',
-        'shippingPolicy',
-      ],
-    });
+    const settings = await this.settingsRepository
+      .createQueryBuilder('settings')
+      .select([
+        'settings.aboutUs',
+        'settings.termsAndConditions',
+        'settings.privacyPolicy',
+        'settings.refundPolicy',
+        'settings.shippingPolicy',
+      ])
+      .where('settings.isActive = :isActive', { isActive: true })
+      .getOne();
 
     if (!settings) {
       throw new NotFoundException('Settings not found or inactive.');
